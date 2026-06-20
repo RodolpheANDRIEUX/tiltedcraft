@@ -1,13 +1,13 @@
 <script>
 	import { onMount } from 'svelte';
 
-	const DISCORD = 'https://discord.gg/VOTRE_LIEN_ICI';
+	const DISCORD = 'https://discord.gg/SGYGyHRm';
 
 	const stats = [
 		{ value: 2064,  suffix: '',  label: 'chunks\nrender distance', sub: 'vs. 10 sur un Realm standard' },
-		{ value: 160,   suffix: '',  label: 'fps\ngarantis', sub: 'shaders fine-tunés à la main' },
+		{ value: 144,   suffix: '',  label: 'fps\ngarantis (ou presque)', sub: 'shaders fine-tunés à la main' },
 		{ value: 64000, suffix: '',  label: 'blocs\nde map',  sub: 'pré-générée, world border inclus' },
-		{ value: 250,   suffix: '+', label: 'mods\nactifs',   sub: 'invisibles — ils perfectionnent' },
+		{ value: 81,   suffix: '+', label: 'mods\nactifs',   sub: 'invisibles — ils perfectionnent' },
 	];
 
 	const profiles = [
@@ -19,12 +19,12 @@
 		{
 			icon: '⚡',
 			title: 'Conquérant',
-			desc: 'Tu veux explorer, progresser, dominer. Une map de 64 000 blocs pré-générée t\'attend. L\'End s\'ouvre après deux semaines — sois prêt.',
+			desc: 'Tu veux explorer, progresser, dominer. Une map de 64 000 blocs pré-générée t\'attend. L\'End s\'ouvre après ~2 semaines — sois prêt.',
 		},
 		{
 			icon: '🤝',
 			title: 'Compagnon',
-			desc: 'Le social avant tout. Des waystones pour se retrouver, des mini-events réguliers, et des coffres à sauter à 2h du mat en vocal sur Discord.',
+			desc: 'Le social avant tout. Des waystones pour se retrouver, des mini-events réguliers, et des coffres sur lesquels sauter à 2h du mat en voc sur Discord.',
 		},
 		{
 			icon: '🌱',
@@ -43,11 +43,13 @@
 		{
 			num: '02',
 			title: 'Importer le modpack',
-			body: 'Clique sur Add Instance → Import → colle l\'URL de ta config. 3 versions selon ton PC :',
+			body: 'Clique sur Add Instance → Import → colle l\'URL de ta config. 5 versions selon ton PC',
 			configs: [
-				{ label: 'Master Race',  href: '#' },
-				{ label: 'Mid-range',    href: '#' },
-				{ label: 'Grille-Pain', href: '#' },
+				{ label: 'Grille-Pain',    href: 'https://github.com/RodolpheANDRIEUX/tiltedcraft/releases/download/GrillePain/TILTEDCRAFT.-.GrillePain.zip' },
+				{ label: 'Lower Mid',      href: 'https://github.com/RodolpheANDRIEUX/tiltedcraft/releases/download/LowerMid/TILTEDCRAFT.-.LowerMidRange.zip' },
+				{ label: 'Mid-range',      href: 'https://github.com/RodolpheANDRIEUX/tiltedcraft/releases/download/Mid/TILTEDCRAFT.-.MidRange.zip' },
+				{ label: 'High End ✦',     href: 'https://github.com/RodolpheANDRIEUX/tiltedcraft/releases/download/HighEnd/TILTEDCRAFT.-.HighEnd.zip' },
+				{ label: 'Master Race',    href: 'https://github.com/RodolpheANDRIEUX/tiltedcraft/releases/download/MasterRace/TILTEDCRAFT.-.MasterRace.zip' },
 			],
 		},
 		{
@@ -59,6 +61,29 @@
 
 	let statsEl;
 	let animated = false;
+
+	let copiedUrl = null;
+	let highlightStep2 = false;
+	let _resetTimer;
+
+	async function copyConfig(href) {
+		try {
+			await navigator.clipboard.writeText(href);
+		} catch {
+			// fallback pour navigateurs restrictifs
+			const el = document.createElement('textarea');
+			el.value = href;
+			document.body.appendChild(el);
+			el.select();
+			document.execCommand('copy');
+			document.body.removeChild(el);
+		}
+		copiedUrl = href;
+		highlightStep2 = true;
+		clearTimeout(_resetTimer);
+		setTimeout(() => { copiedUrl = null; }, 2200);
+		_resetTimer = setTimeout(() => { highlightStep2 = false; }, 6000);
+	}
 
 	// Countdown — ouverture le 22/06/2026 à 18h00
 	const LAUNCH = new Date('2026-06-22T18:00:00+02:00');
@@ -110,7 +135,7 @@
 
 <svelte:head>
 	<title>TILTEDCRAFT — Minecraft comme il aurait dû être</title>
-	<meta name="description" content="Serveur Minecraft Vanilla++ — ~250 mods, shaders custom, 160fps, 2064 chunks de render distance." />
+	<meta name="description" content="Serveur Minecraft Vanilla++ — ~81 mods, shaders custom, 144fps, 2064 chunks de render distance." />
 	<meta name="robots" content="index, follow" />
 </svelte:head>
 
@@ -203,7 +228,7 @@
 				<p class="eyebrow">Le concept</p>
 				<h2>Minecraft, comme<br />il aurait dû être</h2>
 				<p class="body-copy">
-					Un serveur 1.20.1 Fabric tournant avec ~250 mods qui ne changent pas le jeu — ils le <strong>perfectionnent</strong>. L'unique mod véritablement visible ? <strong>Create.</strong> Tout le reste travaille dans l'ombre&nbsp;: rendu, performances, qualité de vie.
+					Un serveur 1.20.1 Fabric tournant avec ~81 mods qui ne changent pas le jeu — ils le <strong>perfectionnent</strong>. L'unique mod véritablement visible ? <strong>Create.</strong> Tout le reste travaille dans l'ombre&nbsp;: rendu, performances, qualité de vie.
 				</p>
 				<blockquote>
 					Vous ne serez pas dépaysé.<br />Juste émerveillé.
@@ -231,41 +256,48 @@
 <section class="configs-section">
 	<div class="container">
 		<p class="eyebrow text-center reveal">Accessible à tous</p>
-		<h2 class="section-title text-center reveal">3 configs, zéro excuse</h2>
+		<h2 class="section-title text-center reveal">5 configs, zéro excuse</h2>
 
 		<div class="configs-grid">
-			<div class="config-card config-master reveal" style="animation-delay:0ms">
-				<div class="config-rank">PC MASTER RACE</div>
-				<div class="config-icon-big">🚀</div>
-				<h3>Master Race</h3>
-				<p>160 fps en full shaders. Render distance maximale. L'expérience comme elle a été pensée.</p>
-				<div class="config-tags">
-					<span>160 fps</span>
-					<span>Full shaders</span>
-					<span>Ultra render</span>
-				</div>
-			</div>
-
-			<div class="config-card config-mid reveal" style="animation-delay:80ms">
-				<div class="config-rank">MID-RANGE</div>
-				<div class="config-icon-big">⚡</div>
-				<h3>Mid-range</h3>
-				<p>Performances équilibrées, shaders optimisés. Jouer bien, sans sacrifier le visuel.</p>
-				<div class="config-tags">
-					<span>Équilibré</span>
-					<span>Shaders opt.</span>
-				</div>
-			</div>
-
-			<div class="config-card config-toast reveal" style="animation-delay:160ms">
+			<div class="config-card config-toast reveal" style="animation-delay:0ms">
 				<div class="config-rank">GRILLE-PAIN</div>
 				<div class="config-icon-big">🍞</div>
 				<h3>Grille-Pain</h3>
-				<p>Tourne sur un vieux laptop qui ne supportait même pas le vanilla de base. Vraiment.</p>
-				<div class="config-tags">
-					<span>Ultra léger</span>
-					<span>Vieux PC ✓</span>
-				</div>
+				<p>Tourne sur un vieux laptop qui ne supportait même pas le vanilla. Vraiment.</p>
+				<div class="config-tags"><span>Ultra léger</span><span>Vieux PC ✓</span></div>
+			</div>
+
+			<div class="config-card config-lower reveal" style="animation-delay:60ms">
+				<div class="config-rank">LOWER MID</div>
+				<div class="config-icon-big">🖥️</div>
+				<h3>Lower Mid</h3>
+				<p>Un PC d'il y a quelques années ? Cette config est faite pour toi.</p>
+				<div class="config-tags"><span>Léger</span><span>Stable</span></div>
+			</div>
+
+			<div class="config-card config-mid reveal" style="animation-delay:120ms">
+				<div class="config-rank">MID-RANGE</div>
+				<div class="config-icon-big">⚡</div>
+				<h3>Mid-range</h3>
+				<p>Performances équilibrées, shaders optimisés. Jouer bien sans sacrifier trop le visuel.</p>
+				<div class="config-tags"><span>Équilibré</span><span>Shaders opt.</span></div>
+			</div>
+
+			<div class="config-card config-high reveal" style="animation-delay:180ms">
+				<div class="badge-recommended">Recommandé</div>
+				<div class="config-rank">HIGH END</div>
+				<div class="config-icon-big">💎</div>
+				<h3>High End</h3>
+				<p>Quasi-max sans concession. Pour les bonnes machines pour le jeu.</p>
+				<div class="config-tags"><span>Good fps</span><span>Good Shaders</span></div>
+			</div>
+
+			<div class="config-card config-master reveal" style="animation-delay:240ms">
+				<div class="config-rank">MASTER RACE</div>
+				<div class="config-icon-big">🚀</div>
+				<h3>Master Race</h3>
+				<p>3 fps · Shaders full · Render distance maximale. Si t'as pas une 5090 tu peux appeler les pompiers.</p>
+				<div class="config-tags"><span>3 fps</span><span>Full shaders</span></div>
 			</div>
 		</div>
 	</div>
@@ -299,7 +331,7 @@
 
 		<div class="steps">
 			{#each steps as s, i}
-				<div class="step reveal" style="animation-delay:{i * 100}ms">
+				<div class="step reveal" class:step-highlight={highlightStep2 && i === 1} style="animation-delay:{i * 100}ms">
 					<div class="step-num-wrap">
 						<span class="step-num">{s.num}</span>
 						{#if i < steps.length - 1}
@@ -315,7 +347,18 @@
 						{#if s.configs}
 							<div class="step-configs">
 								{#each s.configs as cfg}
-									<a href={cfg.href} class="config-dl">{cfg.label}</a>
+									<button
+										class="config-dl"
+										class:copied={copiedUrl === cfg.href}
+										on:click={() => copyConfig(cfg.href)}
+										title="Copier le lien"
+									>
+										{#if copiedUrl === cfg.href}
+											<span class="copy-icon">✓</span> Copié
+										{:else}
+											{cfg.label}
+										{/if}
+									</button>
 								{/each}
 							</div>
 						{/if}
@@ -691,18 +734,33 @@ blockquote {
 
 .configs-grid {
 	display: grid;
-	grid-template-columns: repeat(3, 1fr);
-	gap: 1.5rem;
+	grid-template-columns: repeat(5, 1fr);
+	gap: 1rem;
+}
+
+.badge-recommended {
+	position: absolute;
+	top: -0.65rem;
+	right: 1rem;
+	background: var(--gold);
+	color: #0a0a0a;
+	font-family: var(--font-mono);
+	font-size: 0.58rem;
+	font-weight: 700;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	padding: 0.22rem 0.7rem;
+	border-radius: 2rem;
+	white-space: nowrap;
 }
 
 .config-card {
 	background: rgba(255,255,255,0.025);
 	border: 1px solid var(--border);
 	border-radius: 1rem;
-	padding: 2.2rem;
+	padding: 2.2rem 1.6rem;
 	transition: transform 0.3s ease, border-color 0.3s ease, background 0.3s ease;
 	position: relative;
-	overflow: hidden;
 }
 
 .config-card::before {
@@ -725,6 +783,16 @@ blockquote {
 .config-mid::before { background: radial-gradient(circle at top left, rgba(74,143,231,0.07), transparent 60%); }
 .config-mid:hover { border-color: rgba(74,143,231,0.45); background: rgba(74,143,231,0.04); }
 .config-mid:hover::before { opacity: 1; }
+
+.config-high { border-color: rgba(160,100,240,0.2); }
+.config-high::before { background: radial-gradient(circle at top left, rgba(160,100,240,0.07), transparent 60%); }
+.config-high:hover { border-color: rgba(160,100,240,0.45); background: rgba(160,100,240,0.04); }
+.config-high:hover::before { opacity: 1; }
+
+.config-lower { border-color: rgba(80,200,180,0.2); }
+.config-lower::before { background: radial-gradient(circle at top left, rgba(80,200,180,0.07), transparent 60%); }
+.config-lower:hover { border-color: rgba(80,200,180,0.45); background: rgba(80,200,180,0.04); }
+.config-lower:hover::before { opacity: 1; }
 
 .config-toast { border-color: rgba(100,200,120,0.2); }
 .config-toast::before { background: radial-gradient(circle at top left, rgba(100,200,120,0.07), transparent 60%); }
@@ -836,6 +904,16 @@ blockquote {
 	grid-template-columns: 80px 1fr;
 	gap: 2rem;
 	align-items: start;
+	padding: 1rem;
+	border-radius: 0.85rem;
+	border: 1px solid transparent;
+	transition: background 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease;
+}
+
+.step.step-highlight {
+	background: rgba(232, 168, 58, 0.04);
+	border-color: rgba(232, 168, 58, 0.3);
+	box-shadow: 0 0 28px rgba(232, 168, 58, 0.07);
 }
 
 .step-num-wrap {
@@ -908,12 +986,27 @@ blockquote {
 	border: 1px solid var(--border);
 	border-radius: 0.35rem;
 	color: var(--white-dim);
-	transition: border-color 0.2s, color 0.2s;
+	background: transparent;
+	cursor: pointer;
+	transition: border-color 0.2s, color 0.2s, background 0.2s;
+	display: inline-flex;
+	align-items: center;
+	gap: 0.3rem;
 }
 
 .config-dl:hover {
 	border-color: var(--gold-dim);
 	color: var(--gold);
+}
+
+.config-dl.copied {
+	border-color: rgba(100, 220, 120, 0.5);
+	color: rgb(100, 220, 120);
+	background: rgba(100, 220, 120, 0.06);
+}
+
+.copy-icon {
+	font-size: 0.8rem;
 }
 
 
@@ -980,7 +1073,7 @@ blockquote {
 	}
 
 	.configs-grid {
-		grid-template-columns: 1fr;
+		grid-template-columns: repeat(3, 1fr);
 	}
 
 	.profiles-grid {
@@ -992,6 +1085,10 @@ blockquote {
 	.hero h1 { font-size: clamp(2.8rem, 14vw, 5rem); white-space: normal; }
 
 	.stats-grid {
+		grid-template-columns: 1fr 1fr;
+	}
+
+	.configs-grid {
 		grid-template-columns: 1fr 1fr;
 	}
 

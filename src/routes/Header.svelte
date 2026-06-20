@@ -1,5 +1,5 @@
 <script>
-	const DISCORD = 'https://discord.gg/VOTRE_LIEN_ICI';
+	const DISCORD = 'https://discord.gg/SGYGyHRm';
 </script>
 
 <header>
