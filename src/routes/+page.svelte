@@ -29,7 +29,7 @@
 		{
 			icon: '🌱',
 			title: 'Débutant',
-			desc: 'Premier serveur ? La config Grille-Pain tourne sur un vieux laptop qui ne supportait même pas le vanilla de base. Bienvenue.',
+			desc: 'Premier serveur ? L\'End est fermé les premières semaines, les waystones t\'évitent de te perdre, et il y a toujours quelqu\'un en voc sur Discord pour t\'aider à t\'installer.',
 		},
 	];
 
@@ -54,6 +54,14 @@
 		},
 		{
 			num: '03',
+			title: 'Télécharger la map',
+			body: 'La map est pré-générée et doit être installée séparément dans ton instance Prism.',
+			warning: '139 Go à télécharger — prévoir au moins 150 Go d\'espace libre avant de commencer.',
+			mapUrl: 'https://tiltedcraft.fr/.voxy.zip',
+			path: 'PrismLauncher\\instances\\TILTEDCRAFT-[config]\\minecraft\\.voxy',
+		},
+		{
+			num: '04',
 			title: 'Se connecter',
 			body: 'Ajoute ton pseudo dans #whitelist✅ sur Discord, lance l\'instance. TILTEDCRAFT apparaît automatiquement dans Multijoueur.',
 		},
@@ -85,19 +93,23 @@
 		_resetTimer = setTimeout(() => { highlightStep2 = false; }, 6000);
 	}
 
-	// Countdown — ouverture le 22/06/2026 à 18h00
-	const LAUNCH = new Date('2026-06-22T18:00:00+02:00');
-	let cd = { d: 0, h: 0, m: 0, s: 0, launched: false };
+	const BETA   = new Date('2026-06-22T18:00:00+02:00');
+	const LAUNCH = new Date('2026-06-26T18:00:00+02:00');
+
+	let cd = { d: 0, h: 0, m: 0, s: 0, phase: 'beta' }; // 'beta' | 'official' | 'done'
 
 	function tick() {
-		const diff = LAUNCH - Date.now();
-		if (diff <= 0) { cd = { d: 0, h: 0, m: 0, s: 0, launched: true }; return; }
+		const now = Date.now();
+		const target = now < BETA ? BETA : LAUNCH;
+		const phase  = now < BETA ? 'beta' : now < LAUNCH ? 'official' : 'done';
+		if (phase === 'done') { cd = { ...cd, phase: 'done' }; return; }
+		const diff = target - now;
 		cd = {
 			d: Math.floor(diff / 86400000),
 			h: Math.floor((diff % 86400000) / 3600000),
 			m: Math.floor((diff % 3600000) / 60000),
 			s: Math.floor((diff % 60000) / 1000),
-			launched: false,
+			phase,
 		};
 	}
 
@@ -153,9 +165,11 @@
 		</p>
 
 		<!-- COUNTDOWN -->
-		{#if !cd.launched}
-		<div class="countdown">
-			<p class="cd-label">Ouverture du serveur dans</p>
+		{#if cd.phase !== 'done'}
+		<div class="countdown" class:cd-official={cd.phase === 'official'}>
+			<p class="cd-label">
+				{cd.phase === 'beta' ? 'Accès bêta dans' : 'Lancement officiel dans'}
+			</p>
 			<div class="cd-grid">
 				<div class="cd-unit">
 					<span class="cd-num">{String(cd.d).padStart(2, '0')}</span>
@@ -177,7 +191,9 @@
 					<span class="cd-sub">sec</span>
 				</div>
 			</div>
-			<p class="cd-date">22 · 06 · 2026 — 18h00</p>
+			<p class="cd-date">
+				{cd.phase === 'beta' ? '22 · 06 · 2026 — 18h00' : '26 · 06 · 2026 — 18h00'}
+			</p>
 		</div>
 		{/if}
 
@@ -259,46 +275,38 @@
 		<h2 class="section-title text-center reveal">5 configs, zéro excuse</h2>
 
 		<div class="configs-grid">
-			<div class="config-card config-toast reveal" style="animation-delay:0ms">
-				<div class="config-rank">GRILLE-PAIN</div>
-				<div class="config-icon-big">🍞</div>
-				<h3>Grille-Pain</h3>
-				<p>Tourne sur un vieux laptop qui ne supportait même pas le vanilla. Vraiment.</p>
-				<div class="config-tags"><span>Ultra léger</span><span>Vieux PC ✓</span></div>
-			</div>
+			{#each [
+				{ cls: 'config-toast', rank: 'GRILLE-PAIN', icon: '🍞', title: 'Grille-Pain', desc: 'Tourne sur un vieux laptop qui ne supportait même pas le vanilla. Vraiment.', tags: ['Ultra léger', 'Vieux PC ✓'], url: 'https://github.com/RodolpheANDRIEUX/tiltedcraft/releases/download/GrillePain/TILTEDCRAFT.-.GrillePain.zip' },
+				{ cls: 'config-lower', rank: 'LOWER MID',   icon: '🖥️', title: 'Lower Mid',   desc: "Un PC d'il y a quelques années ? Cette config est faite pour toi.",          tags: ['Léger', 'Stable'],         url: 'https://github.com/RodolpheANDRIEUX/tiltedcraft/releases/download/LowerMid/TILTEDCRAFT.-.LowerMidRange.zip' },
+				{ cls: 'config-mid',   rank: 'MID-RANGE',   icon: '⚡', title: 'Mid-range',   desc: 'Performances équilibrées, shaders optimisés. Jouer bien sans sacrifier trop le visuel.', tags: ['Équilibré', 'Shaders opt.'], url: 'https://github.com/RodolpheANDRIEUX/tiltedcraft/releases/download/Mid/TILTEDCRAFT.-.MidRange.zip' },
+				{ cls: 'config-high',  rank: 'HIGH END',    icon: '💎', title: 'High End',    desc: 'Quasi-max sans concession. Pour les bonnes machines pour le jeu.',             tags: ['Good fps', 'Good Shaders'], url: 'https://github.com/RodolpheANDRIEUX/tiltedcraft/releases/download/HighEnd/TILTEDCRAFT.-.HighEnd.zip',     recommended: true },
+				{ cls: 'config-master',rank: 'MASTER RACE', icon: '🚀', title: 'Master Race', desc: "3 fps · Shaders full · Render distance maximale. Si t'as pas une 5090 tu peux appeler les pompiers.", tags: ['3 fps', 'Full shaders'], url: 'https://github.com/RodolpheANDRIEUX/tiltedcraft/releases/download/MasterRace/TILTEDCRAFT.-.MasterRace.zip' },
+			] as c, i}
+				<div
+					class="config-card {c.cls} reveal"
+					style="animation-delay:{i * 60}ms"
+					role="button"
+					tabindex="0"
+					aria-label="Copier le lien {c.title}"
+					on:click={() => copyConfig(c.url)}
+					on:keydown={e => e.key === 'Enter' && copyConfig(c.url)}
+				>
+					{#if c.recommended}<div class="badge-recommended">Recommandé</div>{/if}
+					<div class="config-rank">{c.rank}</div>
+					<div class="config-icon-big">{c.icon}</div>
+					<h3>{c.title}</h3>
+					<p>{c.desc}</p>
+					<div class="config-tags">{#each c.tags as t}<span>{t}</span>{/each}</div>
 
-			<div class="config-card config-lower reveal" style="animation-delay:60ms">
-				<div class="config-rank">LOWER MID</div>
-				<div class="config-icon-big">🖥️</div>
-				<h3>Lower Mid</h3>
-				<p>Un PC d'il y a quelques années ? Cette config est faite pour toi.</p>
-				<div class="config-tags"><span>Léger</span><span>Stable</span></div>
-			</div>
-
-			<div class="config-card config-mid reveal" style="animation-delay:120ms">
-				<div class="config-rank">MID-RANGE</div>
-				<div class="config-icon-big">⚡</div>
-				<h3>Mid-range</h3>
-				<p>Performances équilibrées, shaders optimisés. Jouer bien sans sacrifier trop le visuel.</p>
-				<div class="config-tags"><span>Équilibré</span><span>Shaders opt.</span></div>
-			</div>
-
-			<div class="config-card config-high reveal" style="animation-delay:180ms">
-				<div class="badge-recommended">Recommandé</div>
-				<div class="config-rank">HIGH END</div>
-				<div class="config-icon-big">💎</div>
-				<h3>High End</h3>
-				<p>Quasi-max sans concession. Pour les bonnes machines pour le jeu.</p>
-				<div class="config-tags"><span>Good fps</span><span>Good Shaders</span></div>
-			</div>
-
-			<div class="config-card config-master reveal" style="animation-delay:240ms">
-				<div class="config-rank">MASTER RACE</div>
-				<div class="config-icon-big">🚀</div>
-				<h3>Master Race</h3>
-				<p>3 fps · Shaders full · Render distance maximale. Si t'as pas une 5090 tu peux appeler les pompiers.</p>
-				<div class="config-tags"><span>3 fps</span><span>Full shaders</span></div>
-			</div>
+					{#if copiedUrl === c.url}
+					<div class="card-copied-overlay">
+						<span class="card-copied-check">✓</span>
+						<p class="card-copied-main">Lien copié</p>
+						<p class="card-copied-hint">À coller dans Add Instance → Import</p>
+					</div>
+					{/if}
+				</div>
+			{/each}
 		</div>
 	</div>
 </section>
@@ -341,6 +349,25 @@
 					<div class="step-content">
 						<h3>{s.title}</h3>
 						<p>{s.body}</p>
+						{#if s.warning}
+							<div class="step-warning">
+								<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+									<path d="M12 2L2 20h20L12 2Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+									<path d="M12 9v5M12 17.5v.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+								</svg>
+								{s.warning}
+							</div>
+						{/if}
+						{#if s.mapUrl}
+							<a href={s.mapUrl} class="step-map-dl" download>
+								<svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+									<path d="M12 3v13M6 11l6 6 6-6M3 20h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+								</svg>
+								Télécharger .voxy.zip <span class="map-size">139 Go</span>
+							</a>
+							<p class="step-install-hint">Une fois décompressé, place le dossier <code>.voxy</code> ici&nbsp;:</p>
+							<code class="step-path">{s.path}</code>
+						{/if}
 						{#if s.action}
 							<a href={s.action.href} target="_blank" rel="noopener noreferrer" class="step-link">{s.action.label}</a>
 						{/if}
@@ -490,6 +517,10 @@
 	text-transform: uppercase;
 	color: var(--gold);
 }
+
+.cd-official .cd-label { color: var(--blue); }
+.cd-official { border-color: rgba(74,143,231,0.25); background: rgba(74,143,231,0.05); }
+.cd-official .cd-sep  { animation: none; opacity: 0.4; }
 
 .cd-grid {
 	display: flex;
@@ -761,6 +792,10 @@ blockquote {
 	padding: 2.2rem 1.6rem;
 	transition: transform 0.3s ease, border-color 0.3s ease, background 0.3s ease;
 	position: relative;
+	display: flex;
+	flex-direction: column;
+	cursor: pointer;
+	user-select: none;
 }
 
 .config-card::before {
@@ -829,6 +864,7 @@ blockquote {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 0.4rem;
+	margin-bottom: 1rem;
 }
 
 .config-tags span {
@@ -839,6 +875,44 @@ blockquote {
 	border-radius: 2rem;
 	border: 1px solid var(--border);
 	color: var(--muted);
+}
+
+.card-copied-overlay {
+	position: absolute;
+	inset: 0;
+	border-radius: inherit;
+	background: rgba(8, 8, 18, 0.88);
+	backdrop-filter: blur(4px);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 0.3rem;
+	animation: fadeUp 0.2s ease both;
+}
+
+.card-copied-check {
+	font-size: 2rem;
+	color: rgb(100, 220, 120);
+	line-height: 1;
+}
+
+.card-copied-main {
+	font-family: var(--font-head);
+	font-size: 1rem;
+	font-weight: 600;
+	color: rgb(100, 220, 120);
+	margin: 0;
+}
+
+.card-copied-hint {
+	font-family: var(--font-mono);
+	font-size: 0.65rem;
+	letter-spacing: 0.06em;
+	color: var(--muted);
+	text-align: center;
+	padding: 0 1rem;
+	margin: 0;
 }
 
 
@@ -960,6 +1034,85 @@ blockquote {
 	font-size: 0.95rem;
 	line-height: 1.7;
 	margin-bottom: 1rem;
+}
+
+.step-warning {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.6rem;
+	background: rgba(240, 100, 60, 0.08);
+	border: 1px solid rgba(240, 100, 60, 0.3);
+	border-radius: 0.5rem;
+	padding: 0.75rem 1rem;
+	font-size: 0.88rem;
+	color: rgb(250, 140, 100);
+	line-height: 1.5;
+	margin-bottom: 1.1rem;
+}
+
+.step-warning svg {
+	flex-shrink: 0;
+	margin-top: 0.1rem;
+	color: rgb(250, 140, 100);
+}
+
+.step-map-dl {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	font-family: var(--font-mono);
+	font-size: 0.82rem;
+	font-weight: 700;
+	color: var(--white);
+	background: rgba(255,255,255,0.06);
+	border: 1px solid rgba(255,255,255,0.12);
+	border-radius: 0.45rem;
+	padding: 0.55rem 1.1rem;
+	transition: background 0.2s, border-color 0.2s;
+	margin-bottom: 1.2rem;
+}
+
+.step-map-dl:hover {
+	background: rgba(255,255,255,0.1);
+	border-color: rgba(255,255,255,0.22);
+}
+
+.map-size {
+	font-size: 0.7rem;
+	color: var(--muted);
+	border: 1px solid var(--border);
+	border-radius: 2rem;
+	padding: 0.1rem 0.5rem;
+	margin-left: 0.2rem;
+}
+
+.step-install-hint {
+	font-size: 0.85rem;
+	color: var(--muted);
+	margin-bottom: 0.5rem !important;
+}
+
+.step-install-hint code {
+	font-family: var(--font-mono);
+	font-size: 0.82rem;
+	color: var(--white-dim);
+	background: rgba(255,255,255,0.05);
+	padding: 0.1em 0.35em;
+	border-radius: 0.2em;
+}
+
+.step-path {
+	display: block;
+	font-family: var(--font-mono);
+	font-size: 0.76rem;
+	color: var(--gold);
+	background: rgba(232, 168, 58, 0.06);
+	border: 1px solid var(--gold-dim);
+	border-radius: 0.45rem;
+	padding: 0.6rem 0.9rem;
+	margin-bottom: 1rem;
+	word-break: break-all;
+	letter-spacing: 0.02em;
 }
 
 .step-link {
