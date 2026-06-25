@@ -33,13 +33,18 @@
 		},
 	];
 
-	const MAC_URL = '#TODO_MAC_URL';
+	const MAC_URL = 'https://github.com/RodolpheANDRIEUX/tiltedcraft/releases/download/macOS/TILTEDCRAFT.-.MacDeMerde.zip';
 
 	const mapVersions = [
 		{ label: 'Sans map',  size: null,       img: '/images/map/none.png', desc: 'Le jeu n\'affichera que là où vous explorez. Fortement déconseillé.',    url: null,                                          warn: false },
 		{ label: 'Light',     size: '~2 Go',    img: '/images/map/low.png',  desc: 'Vous avez les 5 000 premiers blocs d\'affichés. Idéal seulement si vous restez au spawn.',               url: 'https://tiltedcraft.fr/.voxy-light.zip',       warn: false },
 		{ label: 'Standard',  size: '~20 Go',   img: '/images/map/mid.png',  desc: 'Vous commencez à voir l\'horizon même en voyageant un peu. Parfait si vous n\'avez pas un grand disque dur.',  url: 'https://tiltedcraft.fr/.voxy-standard.zip',    warn: false },
 		{ label: 'Complète',  size: '~200 Go',  img:  '/images/map/full.png',                   desc: 'La full experience. Des chunks à perte de vue dans toutes les directions jusqu\'à la world border. Si vous pouvez vous le permettre, foncez.', url: 'https://tiltedcraft.fr/.voxy.zip', warn: false },
+	];
+
+	const mapDimensions = [
+		{ label: 'Nether', size: '15.1 Go', img: '/images/map/nerher.png', desc: "Avoir le Nether préchargé augmente légèrement la render distance. Vraiment utile seulement sur le toit.", url: '#TODO_NETHER_URL' },
+		{ label: 'End',    size: '12.3 Go', img: '/images/map/end.png',    desc: "9.7M de chunks. Des cités de l'End plein l'horizon. Une vision infinie à 360 degrés.",                    url: '#TODO_END_URL'   },
 	];
 
 	const steps = [
@@ -67,7 +72,7 @@
 			title: 'Télécharger la map',
 			body: 'La map est pré-générée. Choisis la version adaptée à ton espace disque.',
 			mapVersions,
-			path: 'PrismLauncher\\instances\\TILTEDCRAFT-[config]\\minecraft\\.voxy',
+			path: 'PrismLauncher\\instances\\TILTEDCRAFT-[config]\\minecraft\\.voxy\\saves\\UNKNOWN',
 		},
 		{
 			num: '04',
@@ -78,6 +83,7 @@
 
 	let hoveredConfig = null;
 	let lightbox = null;
+	let isMac = false;
 
 	function openLightbox(src) { lightbox = src; }
 	function closeLightbox() { lightbox = null; }
@@ -142,6 +148,8 @@
 	onMount(() => {
 		tick();
 		const timer = setInterval(tick, 1000);
+
+		isMac = /Mac/i.test(navigator.userAgent) && !/iPhone|iPad/.test(navigator.userAgent);
 
 		const io = new IntersectionObserver(
 			(entries) => {
@@ -440,7 +448,16 @@
 						<h3>{s.title}</h3>
 						<p>{s.body}</p>
 						{#if s.mapVersions}
-							<div class="map-versions-grid">
+						{#if isMac}
+							<div class="step-warning step-warning-mac">
+								<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+									<path d="M12 2L2 20h20L12 2Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+									<path d="M12 9v5M12 17.5v.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+								</svg>
+								<span>Ces maps ne sont <strong>pas compatibles macOS</strong>. Utilise la config dédiée 🍎 — elle inclut sa propre gestion de la map.</span>
+							</div>
+						{:else}
+						<div class="map-versions-grid">
 								{#each s.mapVersions as mv}
 								<div class="map-version-card" class:map-warn={mv.warn}>
 								{#if mv.img}
@@ -472,10 +489,45 @@
 								</div>
 								{/each}
 							</div>
+							<!-- Dimensions : Nether & End -->
+							<p class="map-dim-title">Dimensions</p>
+							<div class="map-versions-grid">
+								{#each mapDimensions as dim}
+								<div class="map-version-card">
+									<img
+										src={dim.img}
+										alt={dim.label}
+										class="map-version-img"
+										title="Voir en plein écran"
+										on:click={() => openLightbox(dim.img)}
+									/>
+									<div class="map-version-body">
+										<div class="map-version-header">
+											<span class="map-version-label">{dim.label}</span>
+											<span class="map-version-size">{dim.size}</span>
+										</div>
+										<p class="map-version-desc">{dim.desc}</p>
+										<a href={dim.url} class="step-map-dl" download>
+											<svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v13M6 11l6 6 6-6M3 20h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+											Télécharger {dim.size}
+										</a>
+									</div>
+								</div>
+								{/each}
+							</div>
+
 							<p class="step-install-hint" style="margin-top:1.2rem">
-								Une fois décompressé, place le dossier <code>.voxy</code> ici&nbsp;:
+								Une fois décompressé, place le(s) dossier(s) dans&nbsp;:
 							</p>
 							<code class="step-path">{s.path}</code>
+							<img
+								src="/images/path.png"
+								alt="Illustration du chemin d'installation"
+								class="step-path-img"
+								title="Voir en plein écran"
+								on:click={() => openLightbox('/images/path.png')}
+							/>
+						{/if}
 						{/if}
 						{#if s.action}
 							<a href={s.action.href} target="_blank" rel="noopener noreferrer" class="step-link">{s.action.label}</a>
@@ -1339,6 +1391,34 @@ blockquote {
 }
 
 /* ── map version cards ── */
+.step-warning-mac {
+	background: rgba(130, 80, 255, 0.08);
+	border-color: rgba(130, 80, 255, 0.3);
+	color: rgba(180, 140, 255, 0.9);
+	margin-bottom: 1rem;
+}
+
+.step-warning-mac strong { color: rgb(200, 170, 255); }
+
+
+.step-path-img {
+	display: block;
+	width: 100%;
+	border-radius: 0.5rem;
+	border: 1px solid var(--border);
+	margin-top: 0.75rem;
+	cursor: zoom-in;
+}
+
+.map-dim-title {
+	font-family: var(--font-mono);
+	font-size: 0.68rem;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	color: var(--muted);
+	margin: 1.5rem 0 0.75rem;
+}
+
 .map-versions-grid {
 	display: grid;
 	grid-template-columns: repeat(2, 1fr);
