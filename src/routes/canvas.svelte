@@ -69,17 +69,17 @@
 			ctx.globalCompositeOperation = 'lighter';
 
 			for (let i = 0; i < NUM; i++) {
-				const spread  = Math.PI * 0.85;
-				const base    = -Math.PI / 2 - spread / 2 + (i / (NUM - 1)) * spread;
-				const wobble  = Math.sin(t * 0.00018 + i * 1.73) * 0.06;
-				const angle   = base + wobble;
-				const len     = Math.max(w, h) * 2.8;
-				const ex      = sx + Math.cos(angle) * len;
-				const ey      = sy + Math.sin(angle) * len;
-				const half    = len * (0.026 + Math.sin(t * 0.0008 + i * 0.92) * 0.008);
-				const nx      = Math.cos(angle + Math.PI / 2);
-				const ny      = Math.sin(angle + Math.PI / 2);
-				const pulse   = 0.022 + Math.sin(t * 0.00042 + i * 1.1) * 0.012;
+				const spread = Math.PI * 0.85;
+				const base   = -Math.PI / 2 - spread / 2 + (i / (NUM - 1)) * spread;
+				const wobble = Math.sin(t * 0.00018 + i * 1.73) * 0.06;
+				const angle  = base + wobble;
+				const len    = Math.max(w, h) * 2.8;
+				const ex     = sx + Math.cos(angle) * len;
+				const ey     = sy + Math.sin(angle) * len;
+				const half   = len * (0.026 + Math.sin(t * 0.0008 + i * 0.92) * 0.008);
+				const nx     = Math.cos(angle + Math.PI / 2);
+				const ny     = Math.sin(angle + Math.PI / 2);
+				const pulse  = 0.022 + Math.sin(t * 0.00042 + i * 1.1) * 0.012;
 
 				const g2 = ctx.createLinearGradient(sx, sy, ex, ey);
 				g2.addColorStop(0,    `rgba(232,168,58,${pulse})`);
@@ -99,15 +99,6 @@
 			ctx.restore();
 		}
 
-		function drawHorizon() {
-			const g = ctx.createLinearGradient(0, 0, 0, h * 0.65);
-			g.addColorStop(0,   'rgba(232,168,58,0.035)');
-			g.addColorStop(0.5, 'rgba(70,100,200,0.02)');
-			g.addColorStop(1,   'rgba(0,0,0,0)');
-			ctx.fillStyle = g;
-			ctx.fillRect(0, 0, w, h * 0.65);
-		}
-
 		function drawVignette() {
 			const g = ctx.createRadialGradient(w/2, h/2, h * 0.28, w/2, h/2, Math.max(w, h) * 0.85);
 			g.addColorStop(0, 'rgba(0,0,0,0)');
@@ -121,7 +112,6 @@
 			ctx.clearRect(0, 0, w, h);
 			drawBg();
 			drawRays(t);
-			drawHorizon();
 			for (const p of particles) { p.update(); p.draw(ctx); }
 			drawVignette();
 			raf = requestAnimationFrame(frame);

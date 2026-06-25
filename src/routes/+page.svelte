@@ -33,6 +33,15 @@
 		},
 	];
 
+	const MAC_URL = '#TODO_MAC_URL';
+
+	const mapVersions = [
+		{ label: 'Sans map',  size: null,       img: '/images/map/none.png', desc: 'Le jeu n\'affichera que là où vous explorez. Fortement déconseillé.',    url: null,                                          warn: false },
+		{ label: 'Light',     size: '~2 Go',    img: '/images/map/low.png',  desc: 'Vous avez les 5 000 premiers blocs d\'affichés. Idéal seulement si vous restez au spawn.',               url: 'https://tiltedcraft.fr/.voxy-light.zip',       warn: false },
+		{ label: 'Standard',  size: '~20 Go',   img: '/images/map/mid.png',  desc: 'Vous commencez à voir l\'horizon même en voyageant un peu. Parfait si vous n\'avez pas un grand disque dur.',  url: 'https://tiltedcraft.fr/.voxy-standard.zip',    warn: false },
+		{ label: 'Complète',  size: '~200 Go',  img:  '/images/map/full.png',                   desc: 'La full experience. Des chunks à perte de vue dans toutes les directions jusqu\'à la world border. Si vous pouvez vous le permettre, foncez.', url: 'https://tiltedcraft.fr/.voxy.zip', warn: false },
+	];
+
 	const steps = [
 		{
 			num: '01',
@@ -43,21 +52,21 @@
 		{
 			num: '02',
 			title: 'Importer le modpack',
-			body: 'Clique sur Add Instance → Import → colle l\'URL de ta config. 5 versions selon ton PC',
+			body: 'Clique sur Add Instance → Import → colle l\'URL de ta config. 6 versions disponibles (dont une dédiée macOS) :',
 			configs: [
 				{ label: 'Grille-Pain',    href: 'https://github.com/RodolpheANDRIEUX/tiltedcraft/releases/download/GrillePain/TILTEDCRAFT.-.GrillePain.zip' },
 				{ label: 'Lower Mid',      href: 'https://github.com/RodolpheANDRIEUX/tiltedcraft/releases/download/LowerMid/TILTEDCRAFT.-.LowerMidRange.zip' },
 				{ label: 'Mid-range',      href: 'https://github.com/RodolpheANDRIEUX/tiltedcraft/releases/download/Mid/TILTEDCRAFT.-.MidRange.zip' },
 				{ label: 'High End ✦',     href: 'https://github.com/RodolpheANDRIEUX/tiltedcraft/releases/download/HighEnd/TILTEDCRAFT.-.HighEnd.zip' },
 				{ label: 'Master Race',    href: 'https://github.com/RodolpheANDRIEUX/tiltedcraft/releases/download/MasterRace/TILTEDCRAFT.-.MasterRace.zip' },
+				{ label: '🍎 macOS',       href: MAC_URL },
 			],
 		},
 		{
 			num: '03',
 			title: 'Télécharger la map',
-			body: 'La map est pré-générée et doit être installée séparément dans ton instance Prism.',
-			warning: '139 Go à télécharger — prévoir au moins 150 Go d\'espace libre avant de commencer.',
-			mapUrl: 'https://tiltedcraft.fr/.voxy.zip',
+			body: 'La map est pré-générée. Choisis la version adaptée à ton espace disque.',
+			mapVersions,
 			path: 'PrismLauncher\\instances\\TILTEDCRAFT-[config]\\minecraft\\.voxy',
 		},
 		{
@@ -66,6 +75,12 @@
 			body: 'Ajoute ton pseudo dans #whitelist✅ sur Discord, lance l\'instance. TILTEDCRAFT apparaît automatiquement dans Multijoueur.',
 		},
 	];
+
+	let hoveredConfig = null;
+	let lightbox = null;
+
+	function openLightbox(src) { lightbox = src; }
+	function closeLightbox() { lightbox = null; }
 
 	let statsEl;
 	let animated = false;
@@ -154,6 +169,12 @@
 
 <!-- ═══════════════════════════════ HERO ═══════════════════════════════ -->
 <section class="hero">
+	<!-- PLACEHOLDER IMAGE : remplace ce div par <img src="/images/hero.jpg" alt="" class="hero-bg-img" /> -->
+	<div class="hero-bg" aria-hidden="true">
+		<img src="/images/hero.png" alt="" class="hero-bg-img" />
+		<div class="hero-bg-gradient"></div>
+	</div>
+
 	<div class="hero-inner">
 		<p class="badge">Minecraft 1.20.1 &nbsp;·&nbsp; Fabric &nbsp;·&nbsp; Vanilla++</p>
 
@@ -272,15 +293,16 @@
 <section class="configs-section">
 	<div class="container">
 		<p class="eyebrow text-center reveal">Accessible à tous</p>
-		<h2 class="section-title text-center reveal">5 configs, zéro excuse</h2>
+		<h2 class="section-title text-center reveal">6 configs, zéro excuse</h2>
 
+		<!-- 5 configs Windows -->
 		<div class="configs-grid">
 			{#each [
-				{ cls: 'config-toast', rank: 'GRILLE-PAIN', icon: '🍞', title: 'Grille-Pain', desc: 'Tourne sur un vieux laptop qui ne supportait même pas le vanilla. Vraiment.', tags: ['Ultra léger', 'Vieux PC ✓'], url: 'https://github.com/RodolpheANDRIEUX/tiltedcraft/releases/download/GrillePain/TILTEDCRAFT.-.GrillePain.zip' },
-				{ cls: 'config-lower', rank: 'LOWER MID',   icon: '🖥️', title: 'Lower Mid',   desc: "Un PC d'il y a quelques années ? Cette config est faite pour toi.",          tags: ['Léger', 'Stable'],         url: 'https://github.com/RodolpheANDRIEUX/tiltedcraft/releases/download/LowerMid/TILTEDCRAFT.-.LowerMidRange.zip' },
-				{ cls: 'config-mid',   rank: 'MID-RANGE',   icon: '⚡', title: 'Mid-range',   desc: 'Performances équilibrées, shaders optimisés. Jouer bien sans sacrifier trop le visuel.', tags: ['Équilibré', 'Shaders opt.'], url: 'https://github.com/RodolpheANDRIEUX/tiltedcraft/releases/download/Mid/TILTEDCRAFT.-.MidRange.zip' },
-				{ cls: 'config-high',  rank: 'HIGH END',    icon: '💎', title: 'High End',    desc: 'Quasi-max sans concession. Pour les bonnes machines pour le jeu.',             tags: ['Good fps', 'Good Shaders'], url: 'https://github.com/RodolpheANDRIEUX/tiltedcraft/releases/download/HighEnd/TILTEDCRAFT.-.HighEnd.zip',     recommended: true },
-				{ cls: 'config-master',rank: 'MASTER RACE', icon: '🚀', title: 'Master Race', desc: "3 fps · Shaders full · Render distance maximale. Si t'as pas une 5090 tu peux appeler les pompiers.", tags: ['3 fps', 'Full shaders'], url: 'https://github.com/RodolpheANDRIEUX/tiltedcraft/releases/download/MasterRace/TILTEDCRAFT.-.MasterRace.zip' },
+				{ cls: 'config-toast', rank: 'GRILLE-PAIN', icon: '🍞', title: 'Grille-Pain', desc: 'Tourne sur un vieux laptop qui ne supportait même pas le vanilla. Vraiment.', tags: ['Ultra léger', 'Vieux PC ✓'], url: 'https://github.com/RodolpheANDRIEUX/tiltedcraft/releases/download/GrillePain/TILTEDCRAFT.-.GrillePain.zip', img: '/images/config/grillepain.png' },
+				{ cls: 'config-lower', rank: 'LOWER MID',   icon: '🖥️', title: 'Lower Mid',   desc: "Un PC d'il y a quelques années ? Cette config est faite pour toi.",          tags: ['Léger', 'Stable'],         url: 'https://github.com/RodolpheANDRIEUX/tiltedcraft/releases/download/LowerMid/TILTEDCRAFT.-.LowerMidRange.zip',  img: '/images/config/low.png' },
+				{ cls: 'config-mid',   rank: 'MID-RANGE',   icon: '⚡', title: 'Mid-range',   desc: 'Performances équilibrées, shaders optimisés. Jouer bien sans sacrifier trop le visuel.', tags: ['Équilibré', 'Shaders opt.'], url: 'https://github.com/RodolpheANDRIEUX/tiltedcraft/releases/download/Mid/TILTEDCRAFT.-.MidRange.zip', img: '/images/config/mid.png' },
+				{ cls: 'config-high',  rank: 'HIGH END',    icon: '💎', title: 'High End',    desc: 'Quasi-max sans concession. Pour les machines gaming.',             tags: ['Good fps', 'Good Shaders'], url: 'https://github.com/RodolpheANDRIEUX/tiltedcraft/releases/download/HighEnd/TILTEDCRAFT.-.HighEnd.zip',     recommended: true, img: '/images/config/high.png' },
+				{ cls: 'config-master',rank: 'MASTER RACE', icon: '🚀', title: 'Master Race', desc: "3 fps · Shaders full · Render distance maximale. Si t'as pas une 5090 tu peux appeler les pompiers.", tags: ['3 fps', 'Full shaders'], url: 'https://github.com/RodolpheANDRIEUX/tiltedcraft/releases/download/MasterRace/TILTEDCRAFT.-.MasterRace.zip', img: '/images/config/master.png' },
 			] as c, i}
 				<div
 					class="config-card {c.cls} reveal"
@@ -290,6 +312,8 @@
 					aria-label="Copier le lien {c.title}"
 					on:click={() => copyConfig(c.url)}
 					on:keydown={e => e.key === 'Enter' && copyConfig(c.url)}
+					on:mouseenter={() => hoveredConfig = { icon: c.icon, title: c.title, img: c.img }}
+					on:mouseleave={() => hoveredConfig = null}
 				>
 					{#if c.recommended}<div class="badge-recommended">Recommandé</div>{/if}
 					<div class="config-rank">{c.rank}</div>
@@ -308,9 +332,75 @@
 				</div>
 			{/each}
 		</div>
+
+		<!-- Panneau aperçu interactif -->
+		<div class="config-preview-panel">
+			{#if hoveredConfig}
+				<div class="config-preview-label">
+					<span class="config-preview-icon">{hoveredConfig.icon}</span>
+					Aperçu — <strong>{hoveredConfig.title}</strong>
+				</div>
+				<img
+					src={hoveredConfig.img}
+					alt="Aperçu {hoveredConfig.title}"
+					class="config-preview-img"
+				/>
+			{:else}
+				<div class="config-preview-hint">
+					<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M1 12C3.6 7 7.3 4 12 4s8.4 3 11 8c-2.6 5-6.3 8-11 8S3.6 17 1 12Z" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5"/></svg>
+					Survole une config pour voir un aperçu ingame
+				</div>
+			{/if}
+		</div>
+
+		<!-- Config macOS — à part -->
+		<div class="mac-config-wrap reveal">
+			<div class="mac-config-eyebrow">
+				<span class="mac-os-badge">🍎 macOS</span>
+				Aussi disponible — compatible Apple Silicon &amp; Intel
+			</div>
+			<div
+				class="config-card config-mac"
+				role="button"
+				tabindex="0"
+				aria-label="Copier le lien macOS"
+				on:click={() => copyConfig(MAC_URL)}
+				on:keydown={e => e.key === 'Enter' && copyConfig(MAC_URL)}
+				on:mouseenter={() => hoveredConfig = { icon: '🍎', title: 'macOS', img: '/images/config/mac.png' }}
+				on:mouseleave={() => hoveredConfig = null}
+			>
+				<div class="config-rank">macOS</div>
+				<div class="config-icon-big">🍎</div>
+				<h3>macOS</h3>
+				<p>La seule config compatible Apple Silicon et Intel Mac. Shaders adaptés, performances optimisées pour le matériel Apple. Les autres configs ne fonctionnent pas sur Mac.</p>
+				<div class="config-tags"><span>Apple Silicon</span><span>Intel Mac</span><span>Shaders</span></div>
+				{#if copiedUrl === MAC_URL}
+				<div class="card-copied-overlay">
+					<span class="card-copied-check">✓</span>
+					<p class="card-copied-main">Lien copié</p>
+					<p class="card-copied-hint">À coller dans Add Instance → Import</p>
+				</div>
+				{/if}
+			</div>
+		</div>
 	</div>
 </section>
 
+
+<!-- ══════════════════════════════ LIGHTBOX ══════════════════════════════ -->
+{#if lightbox}
+<div
+	class="lightbox"
+	role="dialog"
+	aria-modal="true"
+	on:click={closeLightbox}
+	on:keydown={e => e.key === 'Escape' && closeLightbox()}
+	tabindex="-1"
+>
+	<img src={lightbox} alt="Aperçu plein écran" class="lightbox-img" on:click|stopPropagation />
+	<button class="lightbox-close" on:click={closeLightbox} aria-label="Fermer">✕</button>
+</div>
+{/if}
 
 <!-- ══════════════════════════════ PROFILES ══════════════════════════════ -->
 <section class="profiles-section">
@@ -335,7 +425,7 @@
 <section class="join-section">
 	<div class="container">
 		<p class="eyebrow text-center reveal">C'est l'heure</p>
-		<h2 class="section-title text-center reveal">Rejoindre en 3 étapes</h2>
+		<h2 class="section-title text-center reveal">Rejoindre en 4 étapes</h2>
 
 		<div class="steps">
 			{#each steps as s, i}
@@ -349,23 +439,42 @@
 					<div class="step-content">
 						<h3>{s.title}</h3>
 						<p>{s.body}</p>
-						{#if s.warning}
-							<div class="step-warning">
-								<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-									<path d="M12 2L2 20h20L12 2Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
-									<path d="M12 9v5M12 17.5v.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-								</svg>
-								{s.warning}
+						{#if s.mapVersions}
+							<div class="map-versions-grid">
+								{#each s.mapVersions as mv}
+								<div class="map-version-card" class:map-warn={mv.warn}>
+								{#if mv.img}
+										<img
+											src={mv.img}
+											alt="Map {mv.label}"
+											class="map-version-img"
+											title="Voir en plein écran"
+											on:click={() => openLightbox(mv.img)}
+										/>
+									{:else}
+										<div class="map-version-img map-no-img">🗺️</div>
+									{/if}
+									<div class="map-version-body">
+										<div class="map-version-header">
+											<span class="map-version-label">{mv.label}</span>
+											{#if mv.size}<span class="map-version-size">{mv.size}</span>{/if}
+										</div>
+										<p class="map-version-desc">{mv.desc}</p>
+										{#if mv.url}
+										<a href={mv.url} class="step-map-dl" download>
+											<svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v13M6 11l6 6 6-6M3 20h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+											Télécharger{mv.size ? ` ${mv.size}` : ''}
+										</a>
+										{:else}
+										<span class="map-no-dl">Aucun téléchargement</span>
+										{/if}
+									</div>
+								</div>
+								{/each}
 							</div>
-						{/if}
-						{#if s.mapUrl}
-							<a href={s.mapUrl} class="step-map-dl" download>
-								<svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-									<path d="M12 3v13M6 11l6 6 6-6M3 20h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-								</svg>
-								Télécharger .voxy.zip <span class="map-size">139 Go</span>
-							</a>
-							<p class="step-install-hint">Une fois décompressé, place le dossier <code>.voxy</code> ici&nbsp;:</p>
+							<p class="step-install-hint" style="margin-top:1.2rem">
+								Une fois décompressé, place le dossier <code>.voxy</code> ici&nbsp;:
+							</p>
 							<code class="step-path">{s.path}</code>
 						{/if}
 						{#if s.action}
@@ -414,6 +523,66 @@
 
 
 <style>
+/* ─────────── LIGHTBOX ─────────── */
+.lightbox {
+	position: fixed;
+	inset: 0;
+	z-index: 1000;
+	background: rgba(0,0,0,0.92);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: zoom-out;
+	animation: fadeUp 0.18s ease both;
+}
+
+.lightbox-img {
+	max-width: 92vw;
+	max-height: 88vh;
+	object-fit: contain;
+	border-radius: 0.5rem;
+	cursor: default;
+	box-shadow: 0 0 80px rgba(0,0,0,0.6);
+}
+
+.lightbox-close {
+	position: absolute;
+	top: 1.5rem;
+	right: 1.5rem;
+	width: 2.2rem;
+	height: 2.2rem;
+	border-radius: 50%;
+	background: rgba(255,255,255,0.1);
+	border: 1px solid rgba(255,255,255,0.15);
+	color: var(--white);
+	font-size: 0.9rem;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: background 0.2s;
+}
+
+.lightbox-close:hover { background: rgba(255,255,255,0.2); }
+
+/* ─────────── PLACEHOLDER IMAGES ─────────── */
+.img-placeholder {
+	background: rgba(255,255,255,0.03);
+	border: 1px dashed rgba(255,255,255,0.12);
+	border-radius: 0.5rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: rgba(255,255,255,0.2);
+	font-family: var(--font-mono);
+	font-size: 0.72rem;
+	letter-spacing: 0.06em;
+}
+
+.img-placeholder::after {
+	content: attr(data-label);
+}
+
 /* ─────────────────── REVEAL ANIMATION ─────────────────── */
 @keyframes fadeUp {
 	from { opacity: 0; transform: translateY(20px); }
@@ -437,6 +606,41 @@
 	position: relative;
 }
 
+.hero-bg {
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+	overflow: hidden;
+	border-radius: 0;
+}
+
+.hero-bg-img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	object-position: center;
+	border-radius: 0;
+	border: none;
+}
+
+/* Quand c'est un vrai <img>, supprimer le style placeholder */
+.hero-bg img.hero-bg-img {
+	display: block;
+}
+
+.hero-bg-gradient {
+	position: absolute;
+	inset: 0;
+	background:
+		linear-gradient(to top,    rgba(5,5,8,1) 0%, rgba(5,5,8,0.7) 25%, transparent 55%),
+		linear-gradient(to bottom, rgba(5,5,8,0.75) 0%, transparent 30%);
+}
+
+.hero-inner {
+	position: relative;
+	z-index: 2;
+}
+
 .hero-inner {
 	display: flex;
 	flex-direction: column;
@@ -455,6 +659,9 @@
 	border-radius: 2rem;
 	margin-bottom: 2.5rem;
 	display: inline-block;
+	background: rgba(5,5,8,0.55);
+	backdrop-filter: blur(6px);
+	-webkit-backdrop-filter: blur(6px);
 }
 
 .hero h1 {
@@ -466,16 +673,12 @@
 	margin-bottom: 2rem;
 	color: var(--white);
 	white-space: nowrap;
+	text-shadow: 0 2px 24px rgba(0,0,0,0.2), 0 0 60px rgba(0,0,0,0.5);
 }
 
 .h1-accent {
 	display: inline;
-	background: linear-gradient(120deg, #E8A83A 20%, #FFD97D 50%, #E8A83A 80%);
-	background-size: 200% auto;
-	-webkit-background-clip: text;
-	-webkit-text-fill-color: transparent;
-	background-clip: text;
-	animation: shimmer 3.5s linear infinite;
+	color: var(--white);
 }
 
 @keyframes shimmer {
@@ -485,10 +688,11 @@
 
 .tagline {
 	font-size: clamp(1rem, 2.2vw, 1.2rem);
-	color: var(--white-dim);
+	color: rgba(240,240,240,0.92);
 	line-height: 1.7;
 	max-width: 600px;
 	margin-bottom: 2.5rem;
+	text-shadow: 0 1px 12px rgba(0,0,0,0.5), 0 2px 4px rgba(0,0,0,0.8);
 }
 
 .tagline-em {
@@ -576,6 +780,18 @@
 }
 
 /* ── scroll indicator ── */
+.hero::after {
+	content: '';
+	position: absolute;
+	bottom: -6rem;
+	left: 0;
+	right: 0;
+	height: 6rem;
+	background: linear-gradient(to bottom, var(--bg), transparent);
+	pointer-events: none;
+	z-index: 3;
+}
+
 .scroll-cta {
 	position: absolute;
 	bottom: 2rem;
@@ -767,7 +983,93 @@ blockquote {
 	display: grid;
 	grid-template-columns: repeat(5, 1fr);
 	gap: 1rem;
+	margin-bottom: 1.5rem;
 }
+
+/* ── config preview panel ── */
+.config-preview-panel {
+	border: 1px solid var(--border);
+	border-radius: 1rem;
+	overflow: hidden;
+	margin-bottom: 3rem;
+	aspect-ratio: 16 / 7;
+	position: relative;
+}
+
+.config-preview-label {
+	position: absolute;
+	top: 1rem;
+	left: 1rem;
+	z-index: 2;
+	font-family: var(--font-mono);
+	font-size: 0.72rem;
+	letter-spacing: 0.08em;
+	color: var(--white);
+	background: rgba(5,5,8,0.7);
+	backdrop-filter: blur(6px);
+	padding: 0.35rem 0.8rem;
+	border-radius: 2rem;
+	border: 1px solid var(--border);
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+}
+
+.config-preview-icon { font-size: 1rem; }
+
+.config-preview-img {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	border-radius: 0;
+	border: none;
+	object-fit: cover;
+	object-position: center;
+}
+
+.config-preview-hint {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.6rem;
+	color: var(--muted);
+	font-family: var(--font-mono);
+	font-size: 0.75rem;
+	letter-spacing: 0.06em;
+}
+
+/* ── macOS config ── */
+.mac-config-wrap {
+	margin-top: 1rem;
+}
+
+.mac-config-eyebrow {
+	display: flex;
+	align-items: center;
+	gap: 0.8rem;
+	font-family: var(--font-mono);
+	font-size: 0.7rem;
+	letter-spacing: 0.1em;
+	color: var(--muted);
+	margin-bottom: 1rem;
+}
+
+.mac-os-badge {
+	background: rgba(255,255,255,0.06);
+	border: 1px solid rgba(255,255,255,0.1);
+	border-radius: 0.35rem;
+	padding: 0.2rem 0.65rem;
+	color: var(--white-dim);
+	font-size: 0.72rem;
+}
+
+.config-mac { border-color: rgba(160,160,180,0.2); max-width: 360px; }
+.config-mac::before { background: radial-gradient(circle at top left, rgba(180,180,200,0.06), transparent 60%); }
+.config-mac:hover { border-color: rgba(180,180,200,0.4); background: rgba(180,180,200,0.04); }
+.config-mac:hover::before { opacity: 1; }
 
 .badge-recommended {
 	position: absolute;
@@ -1034,6 +1336,93 @@ blockquote {
 	font-size: 0.95rem;
 	line-height: 1.7;
 	margin-bottom: 1rem;
+}
+
+/* ── map version cards ── */
+.map-versions-grid {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 1rem;
+	margin-top: 0.5rem;
+}
+
+.map-version-card {
+	border: 1px solid var(--border);
+	border-radius: 0.75rem;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+	transition: border-color 0.25s;
+}
+
+.map-version-card:hover { border-color: rgba(255,255,255,0.15); }
+.map-version-card.map-warn { border-color: rgba(240,100,60,0.25); }
+.map-version-card.map-warn:hover { border-color: rgba(240,100,60,0.5); }
+
+.map-version-img {
+	width: 100%;
+	aspect-ratio: 16/9;
+	border-radius: 0;
+	border: none;
+	border-bottom: 1px solid var(--border);
+	object-fit: cover;
+	display: block;
+	cursor: zoom-in;
+}
+
+.map-no-img {
+	width: 100%;
+	aspect-ratio: 16/9;
+	border-bottom: 1px solid var(--border);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 2.5rem;
+	background: rgba(255,255,255,0.02);
+}
+
+.map-version-body {
+	padding: 1rem;
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	flex: 1;
+}
+
+.map-version-header {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 0.5rem;
+}
+
+.map-version-label {
+	font-family: var(--font-head);
+	font-weight: 700;
+	font-size: 1rem;
+	color: var(--white);
+}
+
+.map-version-size {
+	font-family: var(--font-mono);
+	font-size: 0.68rem;
+	color: var(--muted);
+	letter-spacing: 0.06em;
+}
+
+.map-version-desc {
+	font-size: 0.85rem;
+	color: var(--white-dim);
+	line-height: 1.55;
+	margin: 0;
+}
+
+.map-no-dl {
+	font-family: var(--font-mono);
+	font-size: 0.72rem;
+	color: var(--muted);
+	letter-spacing: 0.06em;
+	margin-top: auto;
 }
 
 .step-warning {
